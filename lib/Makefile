@@ -18,7 +18,7 @@ libxdma : libxdma.o
 
 install : libxdma
 	cp ${PWD}/libxdma.so /usr/local/lib
-	cp ${PWD}/libxdma.h /usr/localinclude
+	cp ${PWD}/libxdma.h /usr/local/include
 	chmod 0755 /usr/local/lib/libxdma.so
 	ldconfig
 
