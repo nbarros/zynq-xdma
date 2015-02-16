@@ -17,16 +17,16 @@ libxdma : libxdma.o
 
 
 install : libxdma
-	sudo cp ${PWD}/libxdma.so /usr/lib
-	sudo cp ${PWD}/libxdma.h /usr/include
-	sudo chmod 0755 /usr/lib/libxdma.so
-	sudo ldconfig
+	cp ${PWD}/libxdma.so /usr/local/lib
+	cp ${PWD}/libxdma.h /usr/localinclude
+	chmod 0755 /usr/local/lib/libxdma.so
+	ldconfig
 
 
 uninstall :
-	sudo rm /usr/lib/libxdma.so
-	sudo rm /usr/include/libxdma.h
-	sudo ldconfig
+	rm /usr/lib/libxdma.so
+	rm /usr/include/libxdma.h
+	ldconfig
 
 
 .PHONY : clean

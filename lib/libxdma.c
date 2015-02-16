@@ -15,7 +15,9 @@
 #include <sys/mman.h>
 #include <sys/ioctl.h>
 
-#define BUS_IN_BYTES 4
+// -- NFB: Shouldn't this be 128/8=16...the stream bus is 16 bytes?
+//#define BUS_IN_BYTES 4
+#define BUS_IN_BYTES 16
 #define BUS_BURST 16
 
 static uint32_t alloc_offset;

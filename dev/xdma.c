@@ -204,7 +204,7 @@ static int xdma_prep_buffer(struct xdma_buf_info *buf_info)
 static int xdma_start_transfer(struct xdma_transfer *trans)
 {
 	int ret = 0;
-	unsigned long tmo = msecs_to_jiffies(3000);
+	unsigned long tmo = msecs_to_jiffies(30000);
 	enum dma_status status;
 	struct dma_chan *chan;
 	struct completion *cmp;

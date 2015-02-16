@@ -1,7 +1,7 @@
-CC = gcc
-LDFLAGS := -lxdma
+CC = ${CROSS_COMPILE}gcc
+LDFLAGS := -L../lib -lxdma
 CFLAGS := -c -Wall
-INCLUDES := -I. -I../dev
+INCLUDES := -I. -I../dev -I../lib
 
 EXECUTABLE = \
 	app \
