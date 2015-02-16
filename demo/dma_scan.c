@@ -43,11 +43,12 @@ int main(int argc, char *argv[])
 //					 LENGTH);
 //	}
 	int ret = 0;
-	int pos = 0;
+	uint32_t pos = 0;
 	while (ret>= 0) {
 		// CHanged length to 16 to make sure that we pull a frame at a time
-		ret = xdma_perform_transaction(0,XDMA_WAIT_DST,NULL,0,&(dst[pos]),16);
-		printf("===: dst buffer after transmission:\n");
+		ret = xdma_perform_transaction(0,XDMA_WAIT_DST,NULL,0,dst,16);
+
+		printf("===: dst buffer after transmission [pos : %d]:\n",pos);
 			for (i = pos+3; i >= pos; --i) {
 				printf("%u[%X] ", dst[i],dst[i]);
 			}
