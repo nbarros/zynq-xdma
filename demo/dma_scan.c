@@ -44,28 +44,39 @@ int main(int argc, char *argv[])
 //	}
 	int ret = 0;
 	uint32_t pos = 0;
+	uint32_t j = 0;
 	while (ret>= 0) {
 		// CHanged length to 16 to make sure that we pull a frame at a time
-		ret = xdma_perform_transaction(0,XDMA_WAIT_DST,NULL,0,dst,16);
+		ret = xdma_perform_transaction(0,XDMA_WAIT_DST,NULL,0,&(dst[pos]),16);
 
 		printf("===: dst buffer after transmission [pos : %d]:\n",pos);
-			for (i = pos+3; i >= pos; --i) {
-				printf("%u[%X] ", dst[i],dst[i]);
+			for (j = pos+4; j > pos; --j) {
+				printf("%u[%08X] ", dst[j-1],dst[j-1]);
 			}
 			printf("\n");
 			if (ret < 0) {
 
 				printf("Something happened [%d].\n",ret);
-				break;
+				if (ret == -1) {
+					printf("A timeout happened. Waiting again.\n");
+					ret = 0;
+					continue;
+				} else {
+					break;
+				}
 			}
 			pos += 4;
+		if (pos > 1020) {
+		printf("Reached the end. Resetting the position back to the beginning.\n");	
+		 pos = 0;
+		}
 	}
 
-	printf("test: dst buffer after transmit:\n");
-	for (i = 0; i < LENGTH; i++) {
-		printf("%u[%X] ", dst[i],dst[i]);
-	}
-	printf("\n");
+//	printf("test: dst buffer after transmit:\n");
+//	for (i = 0; i < LENGTH; i++) {
+//		printf("%u[%08X] ", dst[i],dst[i]);
+//	}
+//	printf("\n");
 
 	xdma_exit();
 
