@@ -6,7 +6,8 @@ INCLUDES := -I. -I../dev -I../lib
 EXECUTABLE = \
 	app \
 	demo \
-	test
+	test \
+	scan
 
 
 .PHONY : all
@@ -24,6 +25,8 @@ demo : xdma-demo.o
 app : xdma-app.o
 	$(CC) $< -o $@ $(LDFLAGS)
 
+scan : dma_scan.o
+	$(CC) $< -o $@ $(LDFLAGS)
 
 .c.o:
 	$(CC) $(INCLUDES) $(CFLAGS) $< -o $@
