@@ -48,14 +48,14 @@ int main(int argc, char *argv[])
 		// CHanged length to 16 to make sure that we pull a frame at a time
 		ret = xdma_perform_transaction(0,XDMA_WAIT_DST,NULL,0,&(dst[pos]),16);
 		printf("===: dst buffer after transmission:\n");
-			for (i = pos; i < pos+4; i++) {
+			for (i = pos+3; i >= pos; --i) {
 				printf("%u[%X] ", dst[i],dst[i]);
 			}
 			printf("\n");
 			if (ret < 0) {
-				printf("Something went wrong.\n");
-				xdma_exit();
-				return 0;
+
+				printf("Something happened [%d].\n",ret);
+				break;
 			}
 			pos += 4;
 	}
