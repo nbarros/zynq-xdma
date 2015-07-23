@@ -8,4 +8,6 @@
 demo/app
 demo/test
 demo/demo
-
+demo/scan
+# Eclipse project file
+.project
