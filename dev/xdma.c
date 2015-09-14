@@ -201,39 +201,6 @@ static int xdma_prep_buffer(struct xdma_buf_info *buf_info)
 	return ret;
 }
 
-static int xdma_start_transfer(struct xdma_transfer *trans)
-{
-	int ret = 0;
-	unsigned long tmo = msecs_to_jiffies(30000);
-	enum dma_status status;
-	struct dma_chan *chan;
-	struct completion *cmp;
-	dma_cookie_t cookie;
-
-	chan = (struct dma_chan *)trans->chan;
-	cmp = (struct completion *)trans->completion;
-	cookie = trans->cookie;
-
-	init_completion(cmp);
-	dma_async_issue_pending(chan);
-
-	if (trans->wait) {
-		tmo = wait_for_completion_timeout(cmp, tmo);
-		status = dma_async_is_tx_complete(chan, cookie, NULL, NULL);
-		if (0 == tmo) {
-			printk(KERN_ERR "<%s> Error: transfer timed out\n",
-			       MODULE_NAME);
-			ret = -1;
-		} else if (status != DMA_COMPLETE) {
-			printk(KERN_DEBUG
-			       "<%s> transfer: returned completion callback status of: \'%s\'\n",
-			       MODULE_NAME,
-			       status == DMA_ERROR ? "error" : "in progress");
-			ret = -1;
-		}
-	}
-	return ret;
-}
 
 static void xdma_stop_transfer(struct dma_chan *chan)
 {
@@ -244,6 +211,54 @@ static void xdma_stop_transfer(struct dma_chan *chan)
 		chan_dev->device_control(chan, DMA_TERMINATE_ALL,
 					 (unsigned long)NULL);
 	}
+}
+
+static int xdma_start_transfer(struct xdma_transfer *trans)
+{
+	int ret = 0;
+	unsigned long tmo = msecs_to_jiffies(30000);
+	enum dma_status status;
+	struct dma_chan *chan;
+	struct completion *cmp;
+	dma_cookie_t cookie;
+	dma_cookie_t cookie_last;
+	dma_cookie_t cookie_used;
+
+	chan = (struct dma_chan *)trans->chan;
+	cmp = (struct completion *)trans->completion;
+	cookie = trans->cookie;
+
+	init_completion(cmp);
+	dma_async_issue_pending(chan);
+
+	if (trans->wait) {
+		tmo = wait_for_completion_timeout(cmp, tmo);
+		// NB: Keep track of the cookies.
+		//status = dma_async_is_tx_complete(chan, cookie, NULL, NULL);
+		status = dma_async_is_tx_complete(chan, cookie, &cookie_last,&cookie_used);
+
+		if (0 == tmo) {
+			printk(KERN_ERR "<%s> Error: transfer timed out (%d %d %d)\n",
+			       MODULE_NAME,cookie,cookie_last,cookie_used);
+			// Stop the transfer so that the buffers can be freed
+			xdma_stop_transfer(chan);
+			ret = -1;
+		} else if (status != DMA_COMPLETE) {
+			printk(KERN_ERR
+			       "<%s> transfer: returned completion callback status of: \'%s\' (%d)\n",
+			       MODULE_NAME,
+			       status == DMA_ERROR ? "error" : "in progress",status);
+			printk(KERN_ERR
+			       "<%s> transfer: Cookie status: (%d %d %d)\n",
+			       MODULE_NAME,
+					cookie,cookie_last,cookie_used);
+			// if the transfer is not yet done, something went wrong.
+			// Stop the transfer
+			xdma_stop_transfer(chan);
+			ret = -1;
+		}
+	}
+	return ret;
 }
 
 static void xdma_test_transfer(void)

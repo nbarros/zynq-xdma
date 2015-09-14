@@ -194,6 +194,7 @@ int xdma_perform_transaction(int device_id, enum xdma_wait wait,
 		dst_buf.cookie = 0;
 		dst_buf.buf_offset = (u32) xdma_calc_offset(dst_ptr);
 		dst_buf.buf_size = (u32) (dst_length * sizeof(dst_ptr[0]));
+		//printf("sizeof %u %u %u\n",dst_length,sizeof(dst_ptr[0]),(dst_length * sizeof(dst_ptr[0])));
 		dst_buf.dir = XDMA_DEV_TO_MEM;
 		ret = (int)ioctl(fd, XDMA_PREP_BUF, &dst_buf);
 		if (ret < 0) {
