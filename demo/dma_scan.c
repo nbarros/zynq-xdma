@@ -47,7 +47,7 @@ int main(int argc, char *argv[])
 	uint32_t j = 0;
 	while (ret>= 0) {
 		// CHanged length to 16 to make sure that we pull a frame at a time
-		ret = xdma_perform_transaction(0,XDMA_WAIT_DST,NULL,0,&(dst[pos]),16);
+		ret = xdma_perform_transaction(0,XDMA_WAIT_DST,NULL,0,&(dst[pos]),4);
 
 		printf("===: dst buffer after transmission [pos : %d]:\n",pos);
 			for (j = pos+4; j > pos; --j) {

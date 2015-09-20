@@ -24,8 +24,8 @@ install : libxdma
 
 
 uninstall :
-	rm /usr/lib/libxdma.so
-	rm /usr/include/libxdma.h
+	rm /usr/local/lib/libxdma.so
+	rm /usr/local/include/libxdma.h
 	ldconfig
 
 
