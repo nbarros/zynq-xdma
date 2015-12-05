@@ -21,7 +21,8 @@
 #include <linux/amba/xilinx_dma.h>
 #include <linux/platform_device.h>
 
-#define REP_LEVEL KERN_INFO
+//#define REP_LEVEL KERN_INFO
+#define REP_LEVEL KERN_DEBUG
 
 static dev_t dev_num;		// Global variable for the device number
 static struct cdev c_dev;	// Global variable for the character device structure
@@ -562,7 +563,7 @@ static int __init xdma_init(void)
 	num_devices = 0;
 
 	/* device constructor */
-	printk(REP_LEVEL "<%s> init: registered\n", MODULE_NAME);
+	printk(KERN_INFO "<%s> init: registered\n", MODULE_NAME);
 	if (alloc_chrdev_region(&dev_num, 0, 1, MODULE_NAME) < 0) {
 		return -1;
 	}
@@ -595,7 +596,7 @@ static int __init xdma_init(void)
 	}
 
 	/* hardware setup */
-	printk(REP_LEVEL "<%s> init: probing\n", MODULE_NAME);
+	printk(KERN_INFO "<%s> init: probing\n", MODULE_NAME);
 	xdma_probe();
 
 	return 0;
@@ -608,7 +609,7 @@ static void __exit xdma_exit(void)
 	device_destroy(cl, dev_num);
 	class_destroy(cl);
 	unregister_chrdev_region(dev_num, 1);
-	printk(REP_LEVEL "<%s> exit: unregistered\n", MODULE_NAME);
+	printk(KERN_INFO "<%s> exit: unregistered\n", MODULE_NAME);
 
 	/* hardware shutdown */
 	xdma_remove();
