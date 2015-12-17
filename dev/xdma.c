@@ -49,7 +49,7 @@ static int xdma_close(struct inode *i, struct file *f)
 static ssize_t xdma_read(struct file *f, char __user * buf, size_t
 			 len, loff_t * off)
 {
-	printk(REP_LEVEL "<%s> file: read()\n", MODULE_NAME);
+  //printk(REP_LEVEL "<%s> file: read()\n", MODULE_NAME);
 
 	return simple_read_from_buffer(buf, len, off, xdma_addr, DMA_LENGTH);
 }
@@ -57,7 +57,7 @@ static ssize_t xdma_read(struct file *f, char __user * buf, size_t
 static ssize_t xdma_write(struct file *f, const char __user * buf,
 			  size_t len, loff_t * off)
 {
-	printk(REP_LEVEL "<%s> file: write()\n", MODULE_NAME);
+  //	printk(REP_LEVEL "<%s> file: write()\n", MODULE_NAME);
 	if (len > (DMA_LENGTH - 1))
 		return -EINVAL;
 
@@ -73,6 +73,7 @@ static int xdma_mmap(struct file *filp, struct vm_area_struct *vma)
 	int result;
 	unsigned long requested_size;
 	requested_size = vma->vm_end - vma->vm_start;
+
 
 	printk(REP_LEVEL "<%s> file: mmap()\n", MODULE_NAME);
 	printk(REP_LEVEL
@@ -219,13 +220,14 @@ static void xdma_stop_transfer(struct dma_chan *chan)
 static int xdma_start_transfer(struct xdma_transfer *trans)
 {
 	int ret = 0;
-	unsigned long tmo = msecs_to_jiffies(30000);
+	//	unsigned long tmo = msecs_to_jiffies(30000);
+	unsigned long tmo = msecs_to_jiffies(3000); // 3 sec timeout. Should be well more than enough
 	enum dma_status status;
 	struct dma_chan *chan;
 	struct completion *cmp;
 	dma_cookie_t cookie;
-	dma_cookie_t cookie_last;
-	dma_cookie_t cookie_used;
+	/* dma_cookie_t cookie_last; */
+	/* dma_cookie_t cookie_used; */
 
 	chan = (struct dma_chan *)trans->chan;
 	cmp = (struct completion *)trans->completion;
@@ -236,25 +238,25 @@ static int xdma_start_transfer(struct xdma_transfer *trans)
 
 	if (trans->wait) {
 		tmo = wait_for_completion_timeout(cmp, tmo);
-		// NB: Keep track of the cookies.
-		//status = dma_async_is_tx_complete(chan, cookie, NULL, NULL);
-		status = dma_async_is_tx_complete(chan, cookie, &cookie_last,&cookie_used);
+		// NFB: Keep track of the cookies.
+		status = dma_async_is_tx_complete(chan, cookie, NULL, NULL);
+		//status = dma_async_is_tx_complete(chan, cookie, &cookie_last,&cookie_used);
 
 		if (0 == tmo) {
-			printk(KERN_ERR "<%s> Error: transfer timed out (%d %d %d)\n",
-			       MODULE_NAME,cookie,cookie_last,cookie_used);
-			// Stop the transfer so that the buffers can be freed
+		  //printk(KERN_ERR "<%s> Error: transfer timed out (%d %d %d)\n",
+		  //MODULE_NAME,cookie,cookie_last,cookie_used);
+		  // Stop the transfer so that the buffers can be freed
 			xdma_stop_transfer(chan);
 			ret = -1;
 		} else if (status != DMA_COMPLETE) {
-			printk(KERN_ERR
-			       "<%s> transfer: returned completion callback status of: \'%s\' (%d)\n",
-			       MODULE_NAME,
-			       status == DMA_ERROR ? "error" : "in progress",status);
-			printk(KERN_ERR
-			       "<%s> transfer: Cookie status: (%d %d %d)\n",
-			       MODULE_NAME,
-					cookie,cookie_last,cookie_used);
+		  //printk(KERN_ERR
+		  //"<%s> transfer: returned completion callback status of: \'%s\' (%d)\n",
+		  //MODULE_NAME,
+		  //status == DMA_ERROR ? "error" : "in progress",status);
+		  //	printk(KERN_ERR
+		  //"<%s> transfer: Cookie status: (%d %d %d)\n",
+		  //MODULE_NAME,
+		  //cookie,cookie_last,cookie_used);
 			// if the transfer is not yet done, something went wrong.
 			// Stop the transfer
 			xdma_stop_transfer(chan);
@@ -321,13 +323,13 @@ static void xdma_test_transfer(void)
 	tx_buf.completion = (u32) xdma_dev_info[0]->tx_cmp;
 	xdma_prep_buffer(&tx_buf);
 
-	printk(REP_LEVEL "<%s> test: xdma_start_transfer rx\n", MODULE_NAME);
+	//printk(REP_LEVEL "<%s> test: xdma_start_transfer rx\n", MODULE_NAME);
 	rx_trans.chan = xdma_dev_info[0]->rx_chan;
 	rx_trans.wait = 0;
 	rx_trans.completion = (u32) xdma_dev_info[0]->rx_cmp;
 	rx_trans.cookie = rx_buf.cookie;
-
-	printk(REP_LEVEL "<%s> test: xdma_start_transfer tx\n", MODULE_NAME);
+	
+	//printk(REP_LEVEL "<%s> test: xdma_start_transfer tx\n", MODULE_NAME);
 	tx_trans.chan = xdma_dev_info[0]->tx_chan;
 	tx_trans.wait = 1;
 	tx_trans.completion = (u32) xdma_dev_info[0]->tx_cmp;
@@ -382,8 +384,8 @@ static long xdma_ioctl(struct file *file, unsigned int cmd, unsigned long arg)
 
 		break;
 	case XDMA_GET_DEV_INFO:
-		printk(REP_LEVEL "<%s> ioctl: XDMA_GET_DEV_INFO\n",
-		       MODULE_NAME);
+		/* printk(REP_LEVEL "<%s> ioctl: XDMA_GET_DEV_INFO\n", */
+		/*        MODULE_NAME); */
 
 		if (copy_from_user((void *)&xdma_dev,
 				   (const void __user *)arg,
@@ -398,8 +400,8 @@ static long xdma_ioctl(struct file *file, unsigned int cmd, unsigned long arg)
 
 		break;
 	case XDMA_DEVICE_CONTROL:
-		printk(REP_LEVEL "<%s> ioctl: XDMA_DEVICE_CONTROL\n",
-		       MODULE_NAME);
+		/* printk(REP_LEVEL "<%s> ioctl: XDMA_DEVICE_CONTROL\n", */
+		/*        MODULE_NAME); */
 
 		if (copy_from_user((void *)&chan_cfg,
 				   (const void __user *)arg,
@@ -409,7 +411,7 @@ static long xdma_ioctl(struct file *file, unsigned int cmd, unsigned long arg)
 		xdma_device_control(&chan_cfg);
 		break;
 	case XDMA_PREP_BUF:
-		printk(REP_LEVEL "<%s> ioctl: XDMA_PREP_BUF\n", MODULE_NAME);
+		/* printk(REP_LEVEL "<%s> ioctl: XDMA_PREP_BUF\n", MODULE_NAME); */
 
 		if (copy_from_user((void *)&buf_info,
 				   (const void __user *)arg,
@@ -424,8 +426,8 @@ static long xdma_ioctl(struct file *file, unsigned int cmd, unsigned long arg)
 
 		break;
 	case XDMA_START_TRANSFER:
-		printk(REP_LEVEL "<%s> ioctl: XDMA_START_TRANSFER\n",
-		       MODULE_NAME);
+	  /* printk(REP_LEVEL "<%s> ioctl: XDMA_START_TRANSFER\n", */
+	  /* 	       MODULE_NAME); */
 
 		if (copy_from_user((void *)&trans,
 				   (const void __user *)arg,
@@ -435,8 +437,8 @@ static long xdma_ioctl(struct file *file, unsigned int cmd, unsigned long arg)
 		ret = (long)xdma_start_transfer(&trans);
 		break;
 	case XDMA_STOP_TRANSFER:
-		printk(REP_LEVEL "<%s> ioctl: XDMA_STOP_TRANSFER\n",
-		       MODULE_NAME);
+		/* printk(REP_LEVEL "<%s> ioctl: XDMA_STOP_TRANSFER\n", */
+		/*        MODULE_NAME); */
 
 		if (copy_from_user((void *)&chan,
 				   (const void __user *)arg, sizeof(u32)))
