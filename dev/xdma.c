@@ -221,7 +221,10 @@ static int xdma_start_transfer(struct xdma_transfer *trans)
 {
 	int ret = 0;
 	//	unsigned long tmo = msecs_to_jiffies(30000);
-	unsigned long tmo = msecs_to_jiffies(3000); // 3 sec timeout. Should be well more than enough
+	//unsigned long tmo = msecs_to_jiffies(3000); // 3 sec timeout. Should be well more than enough
+	unsigned long tmo = msecs_to_jiffies(30); // 300 msec timeout. Should be well more than enough
+	// If data is missing for longer than this, then there is a problem
+
 	enum dma_status status;
 	struct dma_chan *chan;
 	struct completion *cmp;
