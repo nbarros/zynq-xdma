@@ -8,6 +8,12 @@ extern "C" {
 #include <linux/types.h>
 #include <asm/ioctl.h>
 
+#ifdef ARM_XDMA
+#include <stdint.h>
+typedef uint32_t u32;
+typedef uint32_t dma_cookie_t;
+#endif
+
 #define MODULE_NAME	"xdma"
 #define DMA_LENGTH	(32*1024*1024)
 #define MAX_DEVICES     4
